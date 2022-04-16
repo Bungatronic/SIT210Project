@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+    <html>
+        <body>
+            <h1>Smart Bathroom Ventilation</h1>
+	    <h4>Enter Particle username and password to modify humidity threshold</h4>
+	    <form name="particle_form">
+                <label for="user">Particle username:</label>
+		<input type="text" id="user" name="user"><br>
+					
+		<label for="pass">Particle password:</label>
+		<input type="password" id="pass" name="pass"><br>
+					
+		<label for="hum">Humidity threshold (0-100):</label>
+		<input type="text" id="hum" name="hum"><br>
+				
+		<input type="button" value="Submit" id="submit" onclick="particleLoginAndPublish();" />
+	    </form>
+	    <h4>Live humidity feed</h4>
+	    <iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/1704936/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>
+
+
+	    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/particle-api-js@8/dist/particle.min.js"></script>
+
+	    <script>
+		function particleLoginAndPublish()
+		{
+		    var particle = new Particle();
+		    var token;
+			
+		    //Login to particle and obtain access token
+		    particle.login({username: document.getElementById('user').value, password: document.getElementById('pass').value }).then(
+		    function(data) {
+		    token = data.body.access_token;
+			
+	            // Publish humidity threshold
+		    var publishEventPr = particle.publishEvent({ name: 'change_humidity', data: document.getElementById('hum').value, auth: token });
+		    publishEventPr.then(
+		        function(data) {
+			    if (data.body.ok) { alert("Event published succesfully") }
+			},
+			function(err) {
+			    alert("Failed to publish event: " + err)
+			}
+		    );
+		    },
+		    function (err) {
+		        alert('Could not log in.', err);
+		    }
+		    );
+		}
+	    </script>
+	</body>
+</html>
+
